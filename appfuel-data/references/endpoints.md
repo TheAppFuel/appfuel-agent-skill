@@ -23,7 +23,7 @@ Public endpoints:
 - `GET /agent/schema/ads`: paid ads filters, pagination, and response shape.
 - `GET /agent/schema/reels`: organic reels filters, pagination, and response shape.
 - `GET /agent/schema/apps`: app search/detail fields.
-- `GET /agent/schema/app-reviews`: Apple App Store review inputs, limits, and response shape.
+- `GET /agent/schema/app-reviews`: App Store review inputs, limits, and response shape.
 - `GET /agent/schema/collections`: saved research operations.
 - `GET /agent/schema/canvases`: research canvas operations and state shape.
 - `GET /mcp/connection`: hosted MCP connection snippets.
@@ -37,8 +37,8 @@ Protected endpoints:
 
 - `GET /agent/usage`: monthly request and download usage.
 - `POST /agent/apps/search`: app discovery by name, category, audience, job-to-be-done, competitor set, product concept, or app description.
-- `POST /agent/apps/detail`: one app's metadata, intelligence, revenue series, latest rankings, similar apps, and App Fuel gallery entry points.
-- `POST /agent/apps/reviews`: live public Apple App Store reviews for one app and storefront countries. Use for pain points, objections, praise language, and hook research.
+- `POST /agent/apps/detail`: one app's metadata, intelligence, recent revenue series, similar apps, and App Fuel gallery entry points. Set `include_rankings=true` only when ranking data is needed; use `rankings_limit` to keep ranking output compact.
+- `POST /agent/apps/reviews`: live public App Store reviews for one app and App Store countries. Use for pain points, objections, praise language, and hook research.
 - `POST /agent/ads/search`: enriched paid ad search.
 - `POST /agent/ads/detail`: detailed paid ad creative snapshot, media, app context, and sanitized AI analysis.
 - `POST /agent/ads/similar`: similar paid ad creatives from one source creative.
@@ -48,10 +48,10 @@ Protected endpoints:
 - `POST /agent/collections/update`: make a saved collection public or private.
 - `POST /agent/collections/save-item`: save an app, paid ad, or organic reel.
 - `POST /agent/canvases/list`: list research canvases.
-- `POST /agent/canvases/create`: create or reuse a named research canvas.
+- `POST /agent/canvases/create`: create a new named research canvas.
 - `POST /agent/canvases/get`: read the full state of one research canvas.
-- `POST /agent/canvases/update`: update canvas metadata, visibility, viewport, nodes, groups, or arrows.
-- `POST /agent/canvases/snapshot`: return an SVG visual snapshot of the full canvas or a crop rectangle.
+- `POST /agent/canvases/update`: update canvas metadata, visibility, viewport, nodes, or groups.
+- `POST /agent/canvases/snapshot`: return focused `visualPreviewUrl` links for the full canvas or crop rectangles.
 
 App search request:
 
@@ -77,17 +77,15 @@ App Store reviews request:
 
 Review notes:
 
-- `countries` is required and uses two-letter Apple storefront codes.
+- `countries` is required and uses two-letter App Store country codes.
 - One call scans at most 1,000 total reviews across all countries.
-- Apple returns 20 reviews per upstream page; App Fuel fetches and merges pages.
 - `ratings` filters after fetching the latest scanned reviews. The backend does not keep crawling until it finds 1,000 matching low-star or high-star reviews.
-- Reviews are returned live and are not stored in App Fuel Postgres.
-- Apple documents App Store Connect customer review APIs for owned apps, but this public storefront review source is an observed AMP API and is not documented by Apple as a public developer API.
+- Reviews are returned live and are not stored by App Fuel.
 - If `reviews_per_country` or `countries * reviews_per_country` exceeds 1,000 scanned reviews, the REST endpoint returns HTTP 400 with `error.code="app_reviews_limit_exceeded"`, plus `requested` and `limit`.
 
-Agent REST and MCP tool errors use `{"error": {...}, "detail": {...}}`. Branch on `error.code`; use `error.invalid_fields[]` to repair request fields before retrying. Common codes are `invalid_request`, `app_reviews_limit_exceeded`, `app_reviews_country_limit_exceeded`, `not_found`, `app_not_found`, `ad_not_found`, `canvas_not_found`, `apple_reviews_rate_limited`, `apple_reviews_configuration_error`, `apple_reviews_upstream_error`, and `monthly_request_limit_exceeded`.
+Agent REST and MCP tool errors use `{"error": {...}, "detail": {...}}`. Branch on `error.code`; use `error.invalid_fields[]` to repair request fields before retrying. Common codes are `invalid_request`, `app_reviews_limit_exceeded`, `app_reviews_country_limit_exceeded`, `not_found`, `app_not_found`, `ad_not_found`, `canvas_not_found`, `app_reviews_rate_limited`, `app_reviews_configuration_error`, `app_reviews_unavailable`, and `monthly_request_limit_exceeded`.
 
-MCP tools return the same `error`/`detail` object for validation and not-found failures. The `app_store_reviews` tool also returns this object for Apple upstream failures.
+MCP tools return the same `error`/`detail` object for validation and not-found failures. The `app_store_reviews` tool also returns this object when review fetching is temporarily unavailable.
 
 Paid ads request:
 
@@ -124,7 +122,7 @@ Paid ads with app-level semantic constraints:
 }
 ```
 
-Paid ads multi-query request:
+Paid ads multi-query request with semantically distinct alternatives:
 
 ```json
 {
@@ -195,7 +193,7 @@ Organic reels with app-level semantic constraints:
 }
 ```
 
-Organic reels multi-query request:
+Organic reels multi-query request with semantically distinct alternatives:
 
 ```json
 {
@@ -261,8 +259,6 @@ Create research canvas request:
       "height": 420,
       "title": "Before/after transformation",
       "description": "Strong hook with visible progress proof.",
-      "mediaUrl": "https://media.example/ad.mp4",
-      "thumbnailUrl": "https://media.example/ad.jpg",
       "sourceType": "ad",
       "sourceId": "ad_09dad398629428b7d984",
       "groupId": "group-social-proof"
@@ -290,10 +286,6 @@ Create research canvas request:
         "html": "<section><h3>Top pattern</h3><p>Proof first, product UI second.</p></section>"
       }
     }
-  ],
-  "edges": [
-    { "id": "edge-1", "fromNodeId": "note-1", "toNodeId": "ad-1", "label": "example" },
-    { "id": "edge-2", "start": { "x": 760, "y": 190 }, "end": { "x": 620, "y": 140, "nodeId": "ad-1" }, "label": "free note" }
   ]
 }
 ```
@@ -306,7 +298,6 @@ Update research canvas request:
   "is_public": true,
   "nodes": [],
   "groups": [],
-  "edges": [],
   "viewport": { "x": 260, "y": 160, "zoom": 0.9 }
 }
 ```
@@ -314,7 +305,7 @@ Update research canvas request:
 Query rule:
 
 - Use `query` for whole creative-profile search inside ads or reels: scenes, claims, offers, visible UI, captions, transcripts, pain points, creator mechanics, product moments, or hook-like wording. It is not a hook-only embedding search.
-- Send `query` as a string array with short focused alternatives when a user request contains several related creative concepts. Do not send one long keyword string.
+- Send `query` as a string array with short, semantically distinct alternatives when a user request contains several related creative concepts. Do not send one long keyword string, and do not expand one phrase into tiny spelling, punctuation, casing, singular/plural, contraction, or filler-word variants.
 - Put category, active/running status, app ids, app-level semantic constraints, account type, media type, hook type, video duration, dates, revenue, engagement, grouping, sorting, and pagination in filters or typed arguments.
 - Use `app_product_query` for app product concepts, app descriptions, or jobs-to-be-done, such as "photo and video editing apps". If this already scopes the market, do not add a broad category filter unless the user asked for that category.
 - Use `hook_type` only for typed hook-category labels; do not treat it as a hook-only semantic search.
@@ -345,8 +336,9 @@ Canvas notes:
 - Canvases are private by default.
 - Every canvas response can include `workspaceUrl`, which opens the signed-in owner workspace.
 - Public canvases include `canvas.url`, a read-only share link.
-- Snapshot responses include `snapshot.svg`, `snapshot.viewBox`, `snapshot.width`, and `snapshot.height`. Pass `crop: {x, y, width, height}` to inspect one canvas-coordinate area or `crops: [{x, y, width, height}, ...]` to inspect multiple zones in one call; multi-zone responses include `snapshots`.
-- Canvas nodes support `media`, `video`, `image`, `label`, `app`, `ad`, `reel`, and `html`.
-- For html nodes, put safe static markup in `metadata.html`; do not include scripts.
+- For real ad, reel, and app cards, provide `sourceType` plus `sourceId`; App Fuel hydrates the card media, app icon, and metadata from those ids. Do not copy raw payload metadata on those card nodes. Manual App Fuel media/page embeds belong inside html node `metadata.html`.
+- Snapshot responses include `snapshot.viewBox`, `snapshot.width`, `snapshot.height`, and `snapshot.visualPreviewUrl`. Pass `crop: {x, y, width, height}` to inspect one canvas-coordinate area or `crops: [{x, y, width, height}, ...]` to inspect multiple zones in one call; multi-zone responses include `snapshots`, each with its own focused `visualPreviewUrl`.
+- Canvas nodes support `label`, `app`, `ad`, `reel`, and `html`.
+- For html nodes, put safe markup in `metadata.html`. Html nodes may include App Fuel media/page iframes, images, videos, and links. Do not include scripts or third-party embeds.
 - Use `name` in create or update requests when the user asks to name or rename a canvas.
-- Use arrows (`edges`) for relationships and `groups` for themes or clusters. Arrows can attach to nodes with `fromNodeId`/`toNodeId`, use free coordinates with `start`/`end`, or mix one node endpoint with one free point.
+- Use `groups` for themes or clusters.

@@ -1,6 +1,6 @@
 # App Fuel Research Canvases
 
-Read this reference before creating or updating App Fuel research canvases, especially when arranging many findings, adding groups/arrows, using html insight nodes, or inspecting snapshots.
+Read this reference before creating or updating App Fuel research canvases, especially when arranging many findings, adding groups, using html insight nodes, or inspecting snapshots.
 
 ## When To Use A Canvas
 
@@ -10,7 +10,6 @@ Use a canvas when the user wants research to become a visual workspace rather th
 - compare paid ads and organic reels side by side
 - cluster examples by theme or creative strategy
 - preserve selected findings for later review
-- show arrows between inspirations, variants, contrasts, or recommendations
 - give the user a workspace link they can open and continue editing
 
 Use a collection instead when the user mainly wants a saved list. Use both when the user wants a saved library plus a visual synthesis.
@@ -19,11 +18,13 @@ Use a collection instead when the user mainly wants a saved list. Use both when 
 
 1. Use `describe_canvases_schema` when field names are uncertain.
 2. Use `list_canvases` before choosing or modifying an existing canvas.
-3. Use `get_canvas` before updating a canvas so existing nodes, groups, edges, viewport, and user edits are preserved.
+3. Use `get_canvas` before updating a canvas so existing nodes, groups, viewport, and user edits are preserved.
 4. Use `create_canvas` for a new board, or `update_canvas` for layout or visibility changes.
-5. Use stable ids such as `ad-hook-proof-1`, `reel-creator-demo-2`, `group-offers`, or `edge-proof-note-1`.
-6. Use `get_canvas_snapshot` after large updates or when visual verification matters. Use `crop` for one area or `crops` for multiple zones in one call.
+5. Use stable ids such as `ad-hook-proof-1`, `reel-creator-demo-2`, or `group-offers`.
+6. Use `get_canvas_snapshot` after large updates or when visual verification matters. Use a small `crop` for one exact area or `crops` for multiple precise zones in one call. Use returned `visualPreviewUrl` links to inspect the canvas visually.
 7. Return `canvas.workspaceUrl` for the signed-in user. Return `canvas.url` only for public canvases.
+
+For real App Fuel cards, send the id contract only: `type`/`sourceType` of `ad`, `reel`, or `app`, plus `sourceId` from the search result public id or app id. App Fuel hydrates media, thumbnails, app icons, card metadata, and detail payloads from those ids so cards match the user's manually added cards. Do not copy raw ad/reel/app payloads into node metadata for these cards.
 
 ## Canvas State Shape
 
@@ -46,8 +47,6 @@ Use a collection instead when the user mainly wants a saved list. Use both when 
       "height": 460,
       "title": "Progress proof ad",
       "description": "Opens with visible progress proof before app UI.",
-      "mediaUrl": "https://media.theappfuel.com/example.mp4",
-      "thumbnailUrl": "https://media.theappfuel.com/example.jpg",
       "sourceType": "ad",
       "sourceId": "ad_09dad398629428b7d984",
       "groupId": "group-proof"
@@ -62,23 +61,18 @@ Use a collection instead when the user mainly wants a saved list. Use both when 
       "title": "Pattern",
       "description": "Proof appears before the offer, then product UI explains the mechanism."
     }
-  ],
-  "edges": [
-    { "id": "edge-proof-1", "fromNodeId": "note-proof-1", "toNodeId": "ad-proof-1", "label": "explains" }
   ]
 }
 ```
 
 ## Node Types
 
-- `ad`: paid ad card. Use `sourceId` as the `public_id` (`ad_...`) from search results when available; raw `creative_key` is fallback only.
-- `reel`: organic reel card. Use `sourceId` as the `public_id` (`reel_...`) from search results when available; raw `reel_id` is fallback only.
-- `app`: app card. Use `sourceId` as the App Fuel `app.id`.
+- `ad`: paid ad card. Use `sourceId` as the `public_id` (`ad_...`) from search results when available; use another returned ad identifier only when no public id is available. Do not provide media URLs or raw payload metadata for real ad cards.
+- `reel`: organic reel card. Use `sourceId` as the `public_id` (`reel_...`) from search results when available; use another returned reel identifier only when no public id is available. Do not provide media URLs or raw payload metadata for real reel cards.
+- `app`: app card. Use `sourceId` as the App Fuel `app.id`. Do not provide raw app payload metadata for real app cards unless the tool schema explicitly asks for it.
 - `label`: editable note with `title` and `description`.
-- `html`: static insight panel. Put safe static markup in `metadata.html`; do not include scripts, remote iframes, or untrusted embeds.
-- `media`, `video`, `image`: general media nodes when the item is not tied to an App Fuel ad/reel/app result.
-
-Prefer App Fuel media URLs from tool results. Do not invent media URLs. For html nodes, link only to App Fuel pages or media URLs when links are needed.
+- `html`: insight panel. Put safe markup in `metadata.html`. Html nodes may include App Fuel media/page iframes, images, videos, and links. Scripts, event handlers, object/embed tags, iframe `srcdoc`, and non-App-Fuel URLs are stripped.
+Prefer the id contract for real App Fuel results. Do not invent media URLs. Manual App Fuel media URLs belong only inside `metadata.html` for html nodes, not in normal card/media nodes.
 
 ## Layout Guidance
 
@@ -99,34 +93,13 @@ Good layouts:
 
 Avoid overlapping nodes unless the user specifically asks for a pile or moodboard. Preserve user-created positions when updating an existing canvas.
 
-## Groups And Arrows
+## Groups
 
-Use groups for clusters or themes. Set `groupId` on nodes that belong inside a group.
-
-Use arrows to make relationships explicit:
-
-- `fromNodeId` and `toNodeId` for attached arrows between nodes
-- `start` and `end` for freeform arrows
-- one attached endpoint plus one free point for callouts
-
-Examples:
-
-```json
-{ "id": "edge-similar-hook", "fromNodeId": "ad-1", "toNodeId": "ad-2", "label": "same hook" }
-```
-
-```json
-{
-  "id": "edge-callout-1",
-  "start": { "x": 780, "y": 160 },
-  "end": { "x": 610, "y": 140, "nodeId": "ad-1" },
-  "label": "first 2 seconds"
-}
-```
+Use groups for clusters or themes. Groups are top-level `groups` entries, not nodes. Set `groupId` on nodes that belong inside a group.
 
 ## Html Insight Nodes
 
-Use html nodes for compact summaries the user can scan visually: trend cards, scorecards, comparison tables, or next-step recommendations.
+Use html nodes for compact summaries the user can scan visually: trend cards, scorecards, comparison tables, App Fuel media embeds, or next-step recommendations.
 
 Keep markup static and simple:
 
@@ -146,7 +119,7 @@ Keep markup static and simple:
 }
 ```
 
-Do not use scripts. Do not use third-party embeds. Keep external links minimal and App Fuel related.
+Do not use scripts or third-party embeds. Iframes are supported for App Fuel pages and media URLs inside `metadata.html`; non-App-Fuel iframe URLs are removed. Keep links minimal and App Fuel related.
 
 ## Updating Existing Canvases
 
@@ -160,3 +133,7 @@ When updating an existing canvas:
 - use `get_canvas_snapshot` if the layout is complex
 
 If the user asks for a public/shareable canvas, set `is_public=true` and return `canvas.url`. Otherwise keep canvases private and return `canvas.workspaceUrl`.
+
+## Visual Inspection
+
+`get_canvas_snapshot` returns `visualPreviewUrl` links that open the signed-in canvas focused on the requested coordinates. Prefer small canvas-coordinate `crop` rectangles around the exact area you need to inspect. Use `crops` for several precise zones in one call. For interactive visual review, return `canvas.workspaceUrl` or the precise `visualPreviewUrl` so the signed-in user can open the canvas in App Fuel.

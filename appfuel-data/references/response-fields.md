@@ -8,8 +8,7 @@ Top-level search response fields:
 - `generated_at`
 - `summary`
 - `view_url`: shareable App Fuel gallery URL when `return_view=true`; otherwise `null`.
-- `query.input`
-- `query.queries`: normalized creative-content alternatives when `query` was sent as an array.
+- `query.queries`: normalized creative-content alternatives when `query` was sent as an array. These should be semantically distinct alternatives, not tiny spelling or punctuation variants.
 - `query.normalized_filters`
 - `query.search_mode`
 - `kpis`
@@ -20,8 +19,8 @@ Top-level search response fields:
 Paid ad result fields:
 
 - `public_id`: opaque public paid-ad id for URLs, canvases, and save-item, for example `ad_09dad398629428b7d984`.
-- `ad_id`: representative paid ad archive id.
-- `creative_key`: internal App Fuel creative dedupe key, kept as fallback/detail context.
+- `ad_id`: representative paid ad id.
+- `creative_key`: returned paid-ad identifier for detail and similar-ad follow-up when public_id is not available.
 - `app.id`, `app.name`, `app.category`, `app.icon_url`, `app.latest_revenue`
 - `ad.is_active`, `ad.media_type`, `ad.first_seen_at`, `ad.last_seen_at`, `ad.flight_days`, `ad.variants_count`
 - `creative.title`, `creative.body_text`, `creative.description`, `creative.hook_text`, `creative.hook_type`, `creative.cta_text`, `creative.thumbnail_url`, `creative.media_url`
@@ -51,7 +50,7 @@ Similar paid ad fields:
 Organic reel result fields:
 
 - `public_id`: opaque public organic reel id for URLs, canvases, and save-item, for example `reel_8080198d0b44ab81e6c5`.
-- `reel_id`: internal Instagram reel id, kept as fallback/detail context.
+- `reel_id`: returned organic reel identifier for follow-up when public_id is not available.
 - `app.id`, `app.name`, `app.category`, `app.icon_url`, `app.latest_revenue`
 - `organic.instagram_username`, `organic.account_type`, `organic.permalink`, `organic.posted_at`, `organic.views`, `organic.likes`, `organic.comments`
 - `creative.title`, `creative.caption_text`, `creative.music_title`, `creative.music_artist`, `creative.video_duration`, `creative.thumbnail_url`, `creative.video_url`
@@ -79,26 +78,26 @@ App search and app detail fields:
 - `app.intelligence.networkEffects`
 - `app.intelligence.noveltyScore`, `app.intelligence.commodityScore`, `app.intelligence.incumbentScore`
 - `revenue_series`: recent monthly app revenue rows when requested.
-- `latest_rankings`: latest category/country ranking rows when requested.
+- `latest_rankings`: latest category/country/collection ranking snapshot rows when requested. This is capped by `rankings_limit` and is not daily ranking history.
 - `similar_apps`: compact app objects.
 - `view_urls.ads`, `view_urls.organic_reels`: App Fuel gallery entry points for that app.
 
 App Store review fields:
 
 - `schema_version`, `generated_at`, `summary`
-- `source.name`, `source.endpoint`, `source.documented`, `source.apple_page_size`, `source.apple_request`: upstream AMP source metadata with sensitive headers/proxies redacted.
+- `source.name`, `source.type`, `source.freshness`: public App Fuel source metadata.
 - `request.app_id`, `request.countries`, `request.reviews_per_country`, `request.total_review_cap`, `request.ratings`, `request.locale`
 - `app.id`, `app.store_url`
-- `metrics.apple_requests`, `metrics.elapsed_ms`, `metrics.scanned_reviews`, `metrics.filtered_out_reviews`, `metrics.returned_reviews`
-- `countries[]`: per-country requested/returned counts, scanned reviews, filtered reviews, newest/oldest review dates, Apple request count, retry metadata, used proxies, empty-page stop state, and scan-cap state.
-- `reviews[]`: flattened reviews with `id`, `app_id`, `country`, `rank`, `rating`, `title`, `body`, `reviewer_nickname`, `created_at`, and `is_edited`.
+- `metrics.elapsed_ms`, `metrics.scanned_reviews`, `metrics.filtered_out_reviews`, `metrics.returned_reviews`
+- `countries[]`: per-country requested/returned counts, scanned reviews, filtered reviews, newest/oldest review dates, empty-page stop state, and scan-cap state.
+- `reviews[]`: flattened reviews with `id`, `app_id`, `country`, `rank`, `rating`, `title`, `body`, and `created_at`.
 
 Use low-star review bodies for pain clusters, objections, trust gaps, cancellation reasons, confusing UX, and missing features. Use high-star review bodies for desired outcomes, proof language, recommendation language, and moments of delight. Do not assume rating filters return exactly the requested count: rating filters are applied after scanning the latest reviews.
 
 Agent REST and MCP error fields:
 
 - Errors return both `error` and `detail`; they contain the same object for compatibility.
-- `error.code`: machine-readable code such as `invalid_request`, `app_reviews_limit_exceeded`, `app_reviews_country_limit_exceeded`, `not_found`, `app_not_found`, `ad_not_found`, `canvas_not_found`, `apple_reviews_rate_limited`, `apple_reviews_configuration_error`, `apple_reviews_upstream_error`, or `monthly_request_limit_exceeded`.
+- `error.code`: machine-readable code such as `invalid_request`, `app_reviews_limit_exceeded`, `app_reviews_country_limit_exceeded`, `not_found`, `app_not_found`, `ad_not_found`, `canvas_not_found`, `app_reviews_rate_limited`, `app_reviews_configuration_error`, `app_reviews_unavailable`, or `monthly_request_limit_exceeded`.
 - `error.message`: human-readable explanation.
 - `error.status`: HTTP status code.
 - `error.invalid_fields[]`: repair hints for validation errors. Items can include `field`, alternative `fields`, `reason`, `hint`, and rejected `value`.
@@ -117,12 +116,12 @@ Research canvas fields:
 - `canvas.id`, `canvas.name`, `canvas.description`
 - `canvas.shareId`, `canvas.isPublic`
 - `canvas.workspaceUrl`: signed-in owner workspace link.
+- `canvas.visualPreviewUrl`: signed-in owner workspace link focused on a snapshot crop when returned by `get_canvas_snapshot`.
 - `canvas.url`: public read-only share link when `isPublic=true`.
 - `canvas.viewport.x`, `canvas.viewport.y`, `canvas.viewport.zoom`
-- `canvas.nodes`: media/video/image/label/app/ad/reel nodes with id, type, x, y, width, height, title, description, media URL, thumbnail URL, source type/id, optional group id, and metadata.
+- `canvas.nodes`: label/app/ad/reel/html nodes with id, type, x, y, width, height, title, description, source type/id, optional group id, and metadata. For real App Fuel ad, reel, and app cards, provide source type/id and let App Fuel hydrate the card data. Manual App Fuel media/page embeds belong inside html node `metadata.html`, not normal card/media nodes.
 - `canvas.groups`: group rectangles with id, title, x, y, width, height, color, and optional item ids.
-- `canvas.edges`: arrows with id, from node id, to node id, optional label, and optional color.
-- `canvas.nodeCount`, `canvas.groupCount`, `canvas.edgeCount`
+- `canvas.nodeCount`, `canvas.groupCount`
 - `canvas.createdAt`, `canvas.updatedAt`
 
 Canvas list responses include `canvases` and `pagination`. Use `pagination.next_request` when present. Canvas create/get/update responses wrap one canvas in `canvas`.
