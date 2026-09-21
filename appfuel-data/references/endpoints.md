@@ -278,12 +278,12 @@ Create research canvas request:
       "type": "html",
       "x": 390,
       "y": 280,
-      "width": 340,
-      "height": 210,
+      "width": 900,
+      "height": 600,
       "title": "Takeaways",
-      "description": "Static insight card.",
+      "description": "Static report panel.",
       "metadata": {
-        "html": "<section><h3>Top pattern</h3><p>Proof first, product UI second.</p></section>"
+        "html": "<section style=\"font-family:Inter,system-ui,sans-serif;color:#17202c;background:#fffaf7;padding:24px;\"><h2 style=\"margin:0 0 12px;font-size:28px;\">Top pattern</h2><p style=\"margin:0 0 18px;color:#667085;\">Proof first, product UI second.</p><table style=\"width:100%;border-collapse:collapse;background:white;border:1px solid #f4ded4;border-radius:14px;overflow:hidden;\"><tr><th style=\"text-align:left;padding:12px;border-bottom:1px solid #f4ded4;\">Signal</th><th style=\"text-align:left;padding:12px;border-bottom:1px solid #f4ded4;\">Meaning</th></tr><tr><td style=\"padding:12px;\">Immediate proof</td><td style=\"padding:12px;\">The ad shows the outcome before explaining the product.</td></tr></table></section>"
       }
     }
   ]
@@ -312,9 +312,11 @@ Query rule:
 - For "find Health & Fitness apps running ads", use `query=""`, `filters.category="HEALTH_AND_FITNESS"`, `filters.active_status="active"`, and `group_by="app"`.
 - Paid ad search results include `overview` for immediate interpretation: hook, claim, value proposition, pain points, target personas, offer, strategy, ad description, and structure.
 - For one or more specific apps, use `include_app_ids` with App Fuel app ids from `search_apps` or `app_detail`. For paid ads, use `exclude_app_ids` to remove known apps from a market scan.
+- For paid-ad launch recency, use `recency`: `last_7_days`, `last_14_days`, `last_30_days`, `last_90_days`, or `older_than_90_days`. It uses the creative family's earliest Meta start, not the last scrape time.
+- Agent and MCP ad results expose only `recency.bucket` and `recency.label`, not the exact start date or numeric age.
 - For one specific paid ad, use `ad_detail` with `public_id` (`ad_...`) from search results when available; pass it as `creative_key`. Use `similar_ads` with that same id when the user wants more creatives like it.
 
-Common ads filters include `category`, `active_status`, `include_app_ids`, `app_product_query`, `app_semantic_limit`, `exclude_app_ids`, `media_type`, `people_gender`, `people_role`, `people_age_range`, `creative_format`, `production_quality`, `language`, `cut_speed`, `pain_intensity`, `hook_type`, `min_run_days`, `max_run_days`, `min_video_duration_seconds`, `max_video_duration_seconds`, `web_funnel`, `min_app_revenue`, `max_app_revenue`, `app_release_start`, `app_release_end`, `min_radar_average`, `radar_mins`, and `sort`.
+Common ads filters include `category`, `active_status`, `recency`, `include_app_ids`, `app_product_query`, `app_semantic_limit`, `exclude_app_ids`, `media_type`, `people_gender`, `people_role`, `people_age_range`, `creative_format`, `production_quality`, `language`, `cut_speed`, `pain_intensity`, `hook_type`, `min_run_days`, `max_run_days`, `min_video_duration_seconds`, `max_video_duration_seconds`, `web_funnel`, `min_app_revenue`, `max_app_revenue`, `app_release_start`, `app_release_end`, `min_radar_average`, `radar_mins`, and `sort`.
 
 Common reels filters include `category`, `account_type`, `include_app_ids`, `app_product_query`, `app_semantic_limit`, `language`, `hook_type`, `people_gender`, `people_age_range`, `ui_context`, `creator_mode`, `dominant_emotion`, `min_views`, `min_likes`, `min_comments`, `min_video_duration_seconds`, `max_video_duration_seconds`, `min_app_revenue`, `max_app_revenue`, `date_start`, `date_end`, `app_release_start`, `app_release_end`, and `sort`.
 
@@ -339,6 +341,6 @@ Canvas notes:
 - For real ad, reel, and app cards, provide `sourceType` plus `sourceId`; App Fuel hydrates the card media, app icon, and metadata from those ids. Do not copy raw payload metadata on those card nodes. Manual App Fuel media/page embeds belong inside html node `metadata.html`.
 - Snapshot responses include `snapshot.viewBox`, `snapshot.width`, `snapshot.height`, and `snapshot.visualPreviewUrl`. Pass `crop: {x, y, width, height}` to inspect one canvas-coordinate area or `crops: [{x, y, width, height}, ...]` to inspect multiple zones in one call; multi-zone responses include `snapshots`, each with its own focused `visualPreviewUrl`.
 - Canvas nodes support `label`, `app`, `ad`, `reel`, and `html`.
-- For html nodes, put safe markup in `metadata.html`. Html nodes may include App Fuel media/page iframes, images, videos, and links. Do not include scripts or third-party embeds.
+- For html nodes, put safe static markup in `metadata.html`. Use up to about `900x600` for rich report panels; the node auto-fits smaller when content is smaller, the iframe scrolls internally, and the user can resize the node. Html nodes may include inline CSS plus App Fuel media/page iframes, images, videos, and links. Do not include scripts, event handlers, or third-party embeds.
 - Use `name` in create or update requests when the user asks to name or rename a canvas.
 - Use `groups` for themes or clusters.

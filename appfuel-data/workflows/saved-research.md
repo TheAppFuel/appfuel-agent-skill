@@ -33,8 +33,8 @@ Read `references/canvases.md` before creating or updating a canvas. Key rules:
 - Use `get_canvas` before updating so existing nodes, groups, viewport, and user edits are preserved.
 - Use stable node and group ids.
 - For real App Fuel cards, send `type`/`sourceType` as `ad`, `reel`, or `app` and `sourceId` as public ad id, public reel id, or app id. App Fuel hydrates media and metadata.
-- Use `html` nodes for compact static insights, comparison tables, scorecards, next-step recommendations, and App Fuel media/page embeds.
-- Put safe HTML in `metadata.html`. App Fuel permits App Fuel media/page iframes, images, videos, and links there; scripts and non-App-Fuel iframe URLs are stripped.
+- Use `html` nodes for polished static insights, comparison tables, scorecards, report panels, next-step recommendations, and App Fuel media/page embeds.
+- Put safe HTML in `metadata.html`. Use up to about `900x600` for rich report panels; the node auto-fits smaller when content is smaller, content scrolls inside the node, and the user can resize it. App Fuel permits inline CSS plus App Fuel media/page iframes, images, videos, and links there; scripts, event handlers, and non-App-Fuel iframe URLs are stripped.
 - Use `get_canvas_snapshot` after large layout changes or when visual verification matters.
 - Return `canvas.workspaceUrl` for the signed-in user. Return `canvas.url` only when the canvas is public.
 

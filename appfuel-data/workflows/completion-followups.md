@@ -28,8 +28,8 @@ Use these capabilities as ingredients, not as a static list:
 
 - **Save findings:** `save_item`, `create_collection`, `update_collection`, `save_filter`.
 - **Create or update canvas:** `create_canvas`, `get_canvas`, `update_canvas`, `get_canvas_snapshot`.
-- **Canvas contents:** hydrated app/ad/reel cards, label nodes, groups, and safe `html` insight nodes using `metadata.html`.
-- **Canvas embeds:** html nodes may include App Fuel media/page iframes, images, videos, and links. Scripts and non-App-Fuel iframe URLs are stripped.
+- **Canvas contents:** hydrated app/ad/reel cards, label nodes, groups, and safe `html` insight/report nodes using `metadata.html`.
+- **Canvas embeds:** html report nodes should usually use up to about `900x600`, auto-fit smaller when content is smaller, scroll internally, and may include inline CSS plus App Fuel media/page iframes, images, videos, and links. Scripts, event handlers, and non-App-Fuel iframe URLs are stripped.
 - **Deepen creative research:** `ad_detail`, `similar_ads`, `search_ads`, `search_reels`.
 - **Review-to-creative chain:** `app_store_reviews` -> pain/praise clusters -> ad hook/body/CTA brief ideas.
 - **App context:** `app_detail`, `search_apps`, similar apps, recent revenue, rankings when requested.
@@ -68,7 +68,7 @@ If ads were found but not deeply inspected:
 
 If ads are strong enough to preserve or explain visually:
 
-- "Should I create a canvas grouped by hook pattern, with the ad cards plus HTML insight notes for the repeated offers?"
+- "Should I create a canvas grouped by hook pattern, with the ad cards plus HTML report panels for the repeated offers?"
 - "Should I save the winners into a collection so we can revisit or share them later?"
 
 If ads need strategic grounding:

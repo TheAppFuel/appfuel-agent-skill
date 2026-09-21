@@ -119,7 +119,7 @@ Research canvas fields:
 - `canvas.visualPreviewUrl`: signed-in owner workspace link focused on a snapshot crop when returned by `get_canvas_snapshot`.
 - `canvas.url`: public read-only share link when `isPublic=true`.
 - `canvas.viewport.x`, `canvas.viewport.y`, `canvas.viewport.zoom`
-- `canvas.nodes`: label/app/ad/reel/html nodes with id, type, x, y, width, height, title, description, source type/id, optional group id, and metadata. For real App Fuel ad, reel, and app cards, provide source type/id and let App Fuel hydrate the card data. Manual App Fuel media/page embeds belong inside html node `metadata.html`, not normal card/media nodes.
+- `canvas.nodes`: label/app/ad/reel/html nodes with id, type, x, y, width, height, title, description, source type/id, optional group id, and metadata. For real App Fuel ad, reel, and app cards, provide source type/id and let App Fuel hydrate the card data. For rich html report panels, use up to about `900x600`; the node auto-fits smaller when content is smaller, content scrolls inside the node, and the user can resize it. Manual App Fuel media/page embeds belong inside html node `metadata.html`, not normal card/media nodes.
 - `canvas.groups`: group rectangles with id, title, x, y, width, height, color, and optional item ids.
 - `canvas.nodeCount`, `canvas.groupCount`
 - `canvas.createdAt`, `canvas.updatedAt`

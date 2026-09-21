@@ -71,7 +71,7 @@ For real App Fuel cards, send the id contract only: `type`/`sourceType` of `ad`,
 - `reel`: organic reel card. Use `sourceId` as the `public_id` (`reel_...`) from search results when available; use another returned reel identifier only when no public id is available. Do not provide media URLs or raw payload metadata for real reel cards.
 - `app`: app card. Use `sourceId` as the App Fuel `app.id`. Do not provide raw app payload metadata for real app cards unless the tool schema explicitly asks for it.
 - `label`: editable note with `title` and `description`.
-- `html`: insight panel. Put safe markup in `metadata.html`. Html nodes may include App Fuel media/page iframes, images, videos, and links. Scripts, event handlers, object/embed tags, iframe `srcdoc`, and non-App-Fuel URLs are stripped.
+- `html`: static insight or report panel. Put safe markup in `metadata.html`. Html nodes may include inline CSS plus App Fuel media/page iframes, images, videos, and links. Scripts, event handlers, object/embed tags, iframe `srcdoc`, and non-App-Fuel URLs are stripped.
 Prefer the id contract for real App Fuel results. Do not invent media URLs. Manual App Fuel media URLs belong only inside `metadata.html` for html nodes, not in normal card/media nodes.
 
 ## Layout Guidance
@@ -81,7 +81,7 @@ Use roomy cards and clear spacing:
 - paid ad or reel nodes: about `300x460` or larger
 - app nodes: about `320x260` or larger
 - label nodes: about `260x120`
-- html insight nodes: about `360x220`
+- html insight/report nodes: up to about `900x600`; they auto-fit smaller when content is smaller, content scrolls inside the node, and the user can resize it
 - group padding: at least `32` around contained nodes
 - space between groups: at least `80`
 
@@ -99,9 +99,9 @@ Use groups for clusters or themes. Groups are top-level `groups` entries, not no
 
 ## Html Insight Nodes
 
-Use html nodes for compact summaries the user can scan visually: trend cards, scorecards, comparison tables, App Fuel media embeds, or next-step recommendations.
+Use html nodes for polished static summaries the user can scan visually: trend cards, scorecards, comparison tables, report panels, App Fuel media embeds, or next-step recommendations.
 
-Keep markup static and simple:
+Keep markup static. Inline CSS is allowed, so make the panel feel designed, but do not use scripts or event handlers:
 
 ```json
 {
@@ -109,17 +109,17 @@ Keep markup static and simple:
   "type": "html",
   "x": 720,
   "y": 100,
-  "width": 380,
-  "height": 240,
+  "width": 900,
+  "height": 600,
   "title": "Hook pattern",
-  "description": "Summary card",
+  "description": "Static report panel.",
   "metadata": {
-    "html": "<section><h3>Top pattern</h3><p>Proof first, app UI second, offer last.</p><ul><li>3 examples use progress proof</li><li>2 examples use creator testimonial</li></ul></section>"
+    "html": "<section style=\"font-family:Inter,system-ui,sans-serif;color:#17202c;background:#fffaf7;padding:24px;\"><h2 style=\"margin:0 0 12px;font-size:28px;\">Top pattern</h2><p style=\"margin:0 0 18px;color:#667085;\">Proof first, app UI second, offer last.</p><div style=\"display:grid;grid-template-columns:repeat(3,1fr);gap:12px;\"><article style=\"border:1px solid #f4ded4;border-radius:14px;background:#fff;padding:14px;\"><strong>Progress proof</strong><p>3 examples</p></article><article style=\"border:1px solid #f4ded4;border-radius:14px;background:#fff;padding:14px;\"><strong>Creator testimonial</strong><p>2 examples</p></article><article style=\"border:1px solid #f4ded4;border-radius:14px;background:#fff;padding:14px;\"><strong>Product reveal</strong><p>Shown after hook</p></article></div></section>"
   }
 }
 ```
 
-Do not use scripts or third-party embeds. Iframes are supported for App Fuel pages and media URLs inside `metadata.html`; non-App-Fuel iframe URLs are removed. Keep links minimal and App Fuel related.
+The node auto-fits smaller when the HTML content is smaller, up to the `900x600` report-panel max. The iframe scrolls internally when the HTML is taller than the node, and the user can still resize the node manually. Do not use scripts or third-party embeds. Iframes are supported for App Fuel pages and media URLs inside `metadata.html`; non-App-Fuel iframe URLs are removed. Keep links minimal and App Fuel related.
 
 ## Updating Existing Canvases
 
