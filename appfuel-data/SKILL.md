@@ -1,12 +1,13 @@
 ---
 name: appfuel-data
-version: 2026-07-01.agent-guide.13
-description: Use App Fuel enriched app, App Store review, paid ad, organic reel, saved collection, and research canvas intelligence through the App Fuel MCP tools. Trigger when a user asks for app market research, app discovery, competitor lists, review pain points, paid ad examples, organic reel examples, creative patterns, hook research, revenue-filtered app research, saved App Fuel research collections, or visual research canvases.
+metadata:
+  version: 2026-09-21.agent-guide.14
+description: Use App Fuel enriched app, App Store review, paid ad, organic reel, and saved collection intelligence through the App Fuel MCP tools. Trigger when a user asks for app market research, app discovery, competitor lists, review pain points, paid ad examples, organic reel examples, creative patterns, hook research, revenue-filtered app research, or saved App Fuel research collections.
 ---
 
 # App Fuel Data
 
-Use App Fuel for app discovery, competitor research, public App Store reviews, paid ad intelligence, organic Instagram Reel intelligence, saved research collections, and visual research canvases.
+Use App Fuel for app discovery, competitor research, public App Store reviews, paid ad intelligence, organic Instagram Reel intelligence, and saved research collections.
 
 ## Load Only What You Need
 
@@ -17,13 +18,12 @@ This skill uses progressive disclosure. Read the focused file that matches the r
 | Find apps, competitors, app revenue, rankings, or similar apps | `workflows/app-research.md` |
 | Find paid ads, organic reels, creative examples, hooks, formats, or similar ads | `workflows/creative-research.md` |
 | Mine App Store reviews for pain points, praise, objections, or hook evidence | `workflows/review-research.md` |
-| Save findings, create collections, create/update canvases, or visually arrange research | `workflows/saved-research.md` |
+| Save findings, create collections, or organize research | `workflows/saved-research.md` |
 | Decide what to suggest after completing a research task | `workflows/completion-followups.md` |
 | Need endpoint examples or exact request shapes | `references/endpoints.md` |
 | Need returned field names or error payloads | `references/response-fields.md` |
-| Need canvas layout/state details | `references/canvases.md` |
 
-Prefer live schema tools when MCP is connected: `describe_agent_schema`, `describe_ads_schema`, `describe_reels_schema`, `describe_apps_schema`, `describe_app_reviews_schema`, `describe_collections_schema`, and `describe_canvases_schema`. Call `get_agent_instructions` when the installed skill may be stale or tool behavior disagrees with local docs. If the hosted guide disagrees with this file, follow the hosted guide.
+Prefer live schema tools when MCP is connected: `describe_agent_schema`, `describe_ads_schema`, `describe_reels_schema`, `describe_apps_schema`, `describe_app_reviews_schema`, and `describe_collections_schema`. Call `get_agent_instructions` when the installed skill may be stale or tool behavior disagrees with local docs. If the hosted guide disagrees with this file, follow the hosted guide.
 
 ## Core Rules
 
@@ -34,7 +34,7 @@ Prefer live schema tools when MCP is connected: `describe_agent_schema`, `descri
 5. Use `app_product_query` for app-level semantic matching, such as `photo and video editing apps`; it searches the full app intelligence/profile, not a hook or positioning-only field.
 6. If the user only asks for an app/category/status list and gives no creative-content constraint, pass `query=""`.
 7. For several creative concepts, send `query` as 2-8 semantically distinct alternatives. Do not create tiny spelling, punctuation, casing, singular/plural, contraction, or filler-word variants.
-8. Return `view_url`, `canvas.workspaceUrl`, `canvas.url`, `collection.url`, or `visualPreviewUrl` when present and useful.
+8. Return `view_url` or `collection.url` when present and useful.
 9. Treat App Fuel metrics, revenue, ads, reviews, and AI labels as signals unless the response explicitly says otherwise.
 10. Finish useful research by suggesting 2-3 adaptive next actions based on the user's goal, evidence already gathered, missing evidence, and available App Fuel capabilities; read `workflows/completion-followups.md` for the decision pattern.
 

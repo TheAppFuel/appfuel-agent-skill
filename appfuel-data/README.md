@@ -17,7 +17,6 @@ appfuel-data/
 |   |-- saved-research.md
 |   `-- completion-followups.md
 `-- references/
-    |-- canvases.md
     |-- endpoints.md
     `-- response-fields.md
 ```

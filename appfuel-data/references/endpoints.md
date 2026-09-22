@@ -25,7 +25,6 @@ Public endpoints:
 - `GET /agent/schema/apps`: app search/detail fields.
 - `GET /agent/schema/app-reviews`: App Store review inputs, limits, and response shape.
 - `GET /agent/schema/collections`: saved research operations.
-- `GET /agent/schema/canvases`: research canvas operations and state shape.
 - `GET /mcp/connection`: hosted MCP connection snippets.
 - `GET|POST /mcp`: hosted Streamable HTTP MCP endpoint. Use this as the default agent connection.
 - `GET /.well-known/oauth-protected-resource`: MCP protected resource metadata.
@@ -38,7 +37,7 @@ Protected endpoints:
 - `GET /agent/usage`: monthly request and download usage.
 - `POST /agent/apps/search`: app discovery by name, category, audience, job-to-be-done, competitor set, product concept, or app description.
 - `POST /agent/apps/detail`: one app's metadata, intelligence, recent revenue series, similar apps, and App Fuel gallery entry points. Set `include_rankings=true` only when ranking data is needed; use `rankings_limit` to keep ranking output compact.
-- `POST /agent/apps/reviews`: live public App Store reviews for one app and App Store countries. Use for pain points, objections, praise language, and hook research.
+- `POST /agent/apps/reviews`: public App Store reviews for one app and App Store countries, with stored recent pools. Use for pain points, objections, praise language, and hook research.
 - `POST /agent/ads/search`: enriched paid ad search.
 - `POST /agent/ads/detail`: detailed paid ad creative snapshot, media, app context, and sanitized AI analysis.
 - `POST /agent/ads/similar`: similar paid ad creatives from one source creative.
@@ -47,11 +46,6 @@ Protected endpoints:
 - `POST /agent/collections/create`: create or reuse a saved collection.
 - `POST /agent/collections/update`: make a saved collection public or private.
 - `POST /agent/collections/save-item`: save an app, paid ad, or organic reel.
-- `POST /agent/canvases/list`: list research canvases.
-- `POST /agent/canvases/create`: create a new named research canvas.
-- `POST /agent/canvases/get`: read the full state of one research canvas.
-- `POST /agent/canvases/update`: update canvas metadata, visibility, viewport, nodes, or groups.
-- `POST /agent/canvases/snapshot`: return focused `visualPreviewUrl` links for the full canvas or crop rectangles.
 
 App search request:
 
@@ -67,7 +61,7 @@ App Store reviews request:
 
 ```json
 {
-  "app_id": "897446215",
+  "app": "store:897446215",
   "countries": ["us", "gb"],
   "reviews_per_country": 200,
   "ratings": [1, 2, 3],
@@ -77,13 +71,16 @@ App Store reviews request:
 
 Review notes:
 
-- `countries` is required and uses two-letter App Store country codes.
-- One call scans at most 1,000 total reviews across all countries.
-- `ratings` filters after fetching the latest scanned reviews. The backend does not keep crawling until it finds 1,000 matching low-star or high-star reviews.
-- Reviews are returned live and are not stored by App Fuel.
-- If `reviews_per_country` or `countries * reviews_per_country` exceeds 1,000 scanned reviews, the REST endpoint returns HTTP 400 with `error.code="app_reviews_limit_exceeded"`, plus `requested` and `limit`.
+- `app` accepts a name, App Store URL, or `store:<store_id>`; prefer explicit IDs. `app_id` remains an alias.
+- Inspect `app` and `request.resolution`. Ambiguity errors contain candidate store IDs and retry instructions.
+- `countries` defaults to `us`, with up to 10 two-letter storefront codes. A URL country only helps app lookup.
+- `reviews_per_country` is 1-500 (default 500). Every refresh collects up to 500 unique valid reviews per country.
+- `ratings` filters the latest 500-review pool before the return limit, without searching older history to fill a star bucket.
+- App Fuel stores reviews and refresh state in PostgreSQL, reuses recent pools for 14 days, and supports `force_refresh=true`.
+- Stored matching reviews remain available during provider failures; without matching stored data, errors are sanitized and retryable.
+- Requests over 500 per country return HTTP 400 with `error.code="app_reviews_limit_exceeded"`, plus `requested` and `limit`.
 
-Agent REST and MCP tool errors use `{"error": {...}, "detail": {...}}`. Branch on `error.code`; use `error.invalid_fields[]` to repair request fields before retrying. Common codes are `invalid_request`, `app_reviews_limit_exceeded`, `app_reviews_country_limit_exceeded`, `not_found`, `app_not_found`, `ad_not_found`, `canvas_not_found`, `app_reviews_rate_limited`, `app_reviews_configuration_error`, `app_reviews_unavailable`, and `monthly_request_limit_exceeded`.
+Agent REST and MCP tool errors use `{"error": {...}, "detail": {...}}`. Branch on `error.code`; use `error.invalid_fields[]` to repair request fields before retrying. Common codes are `invalid_request`, `app_reviews_limit_exceeded`, `app_reviews_country_limit_exceeded`, `not_found`, `app_not_found`, `ad_not_found`, `app_reviews_rate_limited`, `app_reviews_configuration_error`, `app_reviews_unavailable`, and `monthly_request_limit_exceeded`.
 
 MCP tools return the same `error`/`detail` object for validation and not-found failures. The `app_store_reviews` tool also returns this object when review fetching is temporarily unavailable.
 
@@ -238,70 +235,6 @@ Update collection visibility request:
 }
 ```
 
-Create research canvas request:
-
-```json
-{
-  "name": "Fitness ad hooks map",
-  "description": "Grouped findings from active Health & Fitness ads",
-  "is_public": false,
-  "viewport": { "x": 260, "y": 160, "zoom": 0.9 },
-  "groups": [
-    { "id": "group-social-proof", "title": "Social proof hooks", "x": 0, "y": 0, "width": 900, "height": 620 }
-  ],
-  "nodes": [
-    {
-      "id": "ad-1",
-      "type": "ad",
-      "x": 40,
-      "y": 80,
-      "width": 300,
-      "height": 420,
-      "title": "Before/after transformation",
-      "description": "Strong hook with visible progress proof.",
-      "sourceType": "ad",
-      "sourceId": "ad_09dad398629428b7d984",
-      "groupId": "group-social-proof"
-    },
-    {
-      "id": "note-1",
-      "type": "label",
-      "x": 390,
-      "y": 110,
-      "width": 260,
-      "height": 130,
-      "title": "Pattern",
-      "description": "These ads open with immediate proof before product UI."
-    },
-    {
-      "id": "insight-1",
-      "type": "html",
-      "x": 390,
-      "y": 280,
-      "width": 900,
-      "height": 600,
-      "title": "Takeaways",
-      "description": "Static report panel.",
-      "metadata": {
-        "html": "<section style=\"font-family:Inter,system-ui,sans-serif;color:#17202c;background:#fffaf7;padding:24px;\"><h2 style=\"margin:0 0 12px;font-size:28px;\">Top pattern</h2><p style=\"margin:0 0 18px;color:#667085;\">Proof first, product UI second.</p><table style=\"width:100%;border-collapse:collapse;background:white;border:1px solid #f4ded4;border-radius:14px;overflow:hidden;\"><tr><th style=\"text-align:left;padding:12px;border-bottom:1px solid #f4ded4;\">Signal</th><th style=\"text-align:left;padding:12px;border-bottom:1px solid #f4ded4;\">Meaning</th></tr><tr><td style=\"padding:12px;\">Immediate proof</td><td style=\"padding:12px;\">The ad shows the outcome before explaining the product.</td></tr></table></section>"
-      }
-    }
-  ]
-}
-```
-
-Update research canvas request:
-
-```json
-{
-  "canvas_id": "canvas-id",
-  "is_public": true,
-  "nodes": [],
-  "groups": [],
-  "viewport": { "x": 260, "y": 160, "zoom": 0.9 }
-}
-```
-
 Query rule:
 
 - Use `query` for whole creative-profile search inside ads or reels: scenes, claims, offers, visible UI, captions, transcripts, pain points, creator mechanics, product moments, or hook-like wording. It is not a hook-only embedding search.
@@ -332,15 +265,3 @@ Set `return_view=true` when examples matter and return `view_url` to the user.
 Collections are private by default. Public collections returned by `create_collection`, `update_collection`, and `list_collections` include `collection.url` when a `shareId` is available. Return that URL as the direct collection link after creating or filling a public collection. Private collections do not include a public URL.
 
 Collection limit: a user can keep up to 20,000 saved items inside collections across all collections. When the limit is reached, moving or saving another item into a collection returns an error.
-
-Canvas notes:
-
-- Canvases are private by default.
-- Every canvas response can include `workspaceUrl`, which opens the signed-in owner workspace.
-- Public canvases include `canvas.url`, a read-only share link.
-- For real ad, reel, and app cards, provide `sourceType` plus `sourceId`; App Fuel hydrates the card media, app icon, and metadata from those ids. Do not copy raw payload metadata on those card nodes. Manual App Fuel media/page embeds belong inside html node `metadata.html`.
-- Snapshot responses include `snapshot.viewBox`, `snapshot.width`, `snapshot.height`, and `snapshot.visualPreviewUrl`. Pass `crop: {x, y, width, height}` to inspect one canvas-coordinate area or `crops: [{x, y, width, height}, ...]` to inspect multiple zones in one call; multi-zone responses include `snapshots`, each with its own focused `visualPreviewUrl`.
-- Canvas nodes support `label`, `app`, `ad`, `reel`, and `html`.
-- For html nodes, put safe static markup in `metadata.html`. Use up to about `900x600` for rich report panels; the node auto-fits smaller when content is smaller, the iframe scrolls internally, and the user can resize the node. Html nodes may include inline CSS plus App Fuel media/page iframes, images, videos, and links. Do not include scripts, event handlers, or third-party embeds.
-- Use `name` in create or update requests when the user asks to name or rename a canvas.
-- Use `groups` for themes or clusters.

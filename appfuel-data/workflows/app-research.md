@@ -41,4 +41,3 @@ Useful next actions often include:
 - inspect ads or reels for the top apps
 - pull reviews for selected apps
 - save selected apps to a collection
-- build a canvas mapping apps, creative examples, and opportunity notes

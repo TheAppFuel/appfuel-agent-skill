@@ -15,7 +15,6 @@ appfuel-agent-skill
 - When to use `query` versus structured filters.
 - How to return App Fuel gallery links for human review.
 - How to paginate and save useful findings to App Fuel collections.
-- How to create visual research canvases with hydrated App Fuel app/ad/reel cards.
 - How to suggest useful next actions when a research task is complete.
 - How to avoid exposing internal/admin App Fuel surfaces.
 
@@ -36,7 +35,6 @@ appfuel-agent-skill/
     |   |-- saved-research.md
     |   `-- completion-followups.md
     `-- references/
-        |-- canvases.md
         |-- endpoints.md
         `-- response-fields.md
 ```
@@ -49,7 +47,7 @@ Skill-aware agents do not usually load every file in a skill folder into context
 
 1. The client indexes the skill metadata in `SKILL.md`, especially `name` and `description`.
 2. When a user request matches the description, the agent reads `SKILL.md`.
-3. `SKILL.md` routes the agent to supporting files such as `workflows/creative-research.md` or `references/canvases.md`.
+3. `SKILL.md` routes the agent to supporting files such as `workflows/creative-research.md` or `references/endpoints.md`.
 4. The agent can read files inside the installed skill folder by relative path, as long as the folder was installed/copied with those files.
 
 This means splitting a skill into folders and Markdown files works well. The important rule is that the top-level `SKILL.md` must clearly mention the supporting files and when to read them.
@@ -163,13 +161,12 @@ Before answering App Fuel questions:
 8. Use app_product_query for full app-profile embedding search such as "photo and video editing apps"; it is not a hook/positioning-only embedding. Do not add a broad category filter unless the user asked for it.
 9. Flat search pages are capped at 50 paid creatives or organic reels. Grouped app pages are capped at 20 apps, with up to 24 ads/reels per app. Use pagination.next_request when a response has more results; for deeper examples from one app, make a follow-up flat request with include_app_ids for that app and offset pagination.
 10. Return view_url links when present so the user can inspect the matching creative gallery.
-11. Use app_store_reviews when the user needs public App Store review text, low-star pain points, high-star praise language, objections, trust gaps, desired outcomes, or hook inspiration. Countries are required App Store country codes like us, gb, or de; one call scans at most 1,000 total reviews and counts against API usage.
+11. Use app_store_reviews when the user needs public App Store review text, low-star pain points, high-star praise language, objections, trust gaps, desired outcomes, or hook inspiration. Use app="store:<store_id>", an app name, or an App Store URL; inspect the resolved identity and choose an explicit candidate ID if ambiguous. Countries default to us. Return up to 500 per country across 10 countries; rating filters apply within the recent 500-review pool. Reviews are stored, recent pools are reused for 14 days, and force_refresh=true fetches again. Calls count against API usage.
 12. For creative briefs, cluster review pains, connect them to winning ad/reel angles, and return hook/body/CTA ideas with review evidence and confidence. AI drafts; a human approves.
 13. Use collection tools when the user asks to save or organize research.
-14. Use canvas tools when the user wants a visual board, grouped findings, mapped patterns, or a workspace link.
-15. When a useful research task is complete, suggest 2-3 next actions based on App Fuel capabilities, such as saving to a collection, creating a canvas, pulling similar ads, comparing against reviews, narrowing filters, or fetching the next page.
-16. Do not ask the user to paste an App Fuel API key into chat. If OAuth is unavailable, ask the user to use the API-key fallback from the App Fuel MCP page.
-17. Do not print OAuth tokens, API keys, authorization codes, callback URLs, or refresh tokens in status messages, command transcripts, or final notes.
+14. When a useful research task is complete, suggest 2-3 next actions based on App Fuel capabilities, such as saving to a collection, pulling similar ads, comparing against reviews, narrowing filters, or fetching the next page.
+15. Do not ask the user to paste an App Fuel API key into chat. If OAuth is unavailable, ask the user to use the API-key fallback from the App Fuel MCP page.
+16. Do not print OAuth tokens, API keys, authorization codes, callback URLs, or refresh tokens in status messages, command transcripts, or final notes.
 ```
 
 ## Notes

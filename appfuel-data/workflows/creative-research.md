@@ -94,14 +94,14 @@ Do not expand one phrase into tiny variants such as `POV`, `POV:`, `POV you`, an
 - Read each result's `overview` before calling detail. It usually contains hook, hook type/source, main claim, value proposition, pain points, target personas, offer, strategy summary, ad description, and structure.
 - Use `ad_detail` when the user selects one ad or asks for deeper single-ad analysis.
 - Use `similar_ads` when the user asks for more examples like one ad.
-- Prefer `public_id` (`ad_...`) as `creative_key` for `ad_detail`, `similar_ads`, save-item, and canvas nodes. Use another returned identifier only when no public id exists.
+- Prefer `public_id` (`ad_...`) as `creative_key` for `ad_detail`, `similar_ads`, and save-item. Use another returned identifier only when no public id exists.
 
 ## Organic Reels
 
 - Use `search_reels` for organic Instagram Reel research.
 - Use `account_type`, engagement filters, dates, duration, app revenue, app ids, and category as typed constraints.
 - Return Reels with enough context to compare creator mechanics, app UI moments, captions, hooks, and engagement.
-- Prefer `public_id` (`reel_...`) for save-item and canvas nodes.
+- Prefer `public_id` (`reel_...`) for save-item.
 
 ## Pagination
 
