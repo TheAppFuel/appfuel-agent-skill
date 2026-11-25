@@ -54,6 +54,8 @@ Organic reel result fields:
 - `appfuel_url`: direct App Fuel link that opens this one video; show it verbatim.
 - `source`: `app_reel` (the app's own Instagram reel), `app_video` (the app's own account on UGC Radar, usually its TikTok) or `creator_video` (a creator promoting the app); `platform`: `instagram` or `tiktok`.
 - `creator.handle`, `creator.followers`, `creator.country`, `creator.content_style`, `creator.production`, `creator.faceless`, `creator.ai_visuals`, `creator.standout` (UGC Radar videos only; null for the apps' own Instagram reels)
+- `creative.video_url`: a signed MP4 link (valid for days) the agent can download and watch; `creative.thumbnail_url`: the poster image. Present for every source.
+- `evidence`: the same AI text evidence for every source (below); null only for a creator video UGC Radar has not analysed yet.
 - `similarity.score`, `similarity.same_app` (similar_reels results)
 - `app.id`, `app.name`, `app.category`, `app.icon_url`, `app.latest_revenue`
 - `organic.instagram_username`, `organic.account_type`, `organic.permalink`, `organic.posted_at`, `organic.views`, `organic.likes`, `organic.comments`
