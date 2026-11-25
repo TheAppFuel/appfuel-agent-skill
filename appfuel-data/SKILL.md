@@ -1,7 +1,7 @@
 ---
 name: appfuel-data
 metadata:
-  version: 2026-11-25.agent-guide.17
+  version: 2026-11-25.agent-guide.18
 description: Use App Fuel enriched app, App Store review, paid ad, organic video (the apps' own Instagram Reels and creators' TikTok/Instagram videos), and saved collection intelligence through the App Fuel MCP tools. Trigger when a user asks for app market research, app discovery, competitor lists, review pain points, paid ad examples, organic or creator (UGC) video examples, creative patterns, hook research, revenue-filtered app research, or saved App Fuel research collections.
 ---
 

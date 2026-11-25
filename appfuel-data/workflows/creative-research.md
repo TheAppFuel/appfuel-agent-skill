@@ -99,14 +99,18 @@ Do not expand one phrase into tiny variants such as `POV`, `POV:`, `POV you`, an
 ## Organic Videos (Reels And Creator Videos)
 
 - Use `search_reels` for organic research. `account` picks whose videos: `all` (default) merges the apps' own Instagram Reels with creators' TikTok/Instagram videos that promote an app; `creator` returns creator videos only; `app` the apps' own reels only.
-- Creator-only filters (they switch `account` to `creator`): `platform` (tiktok, instagram), `content_style` (ugc_talking_head, screen_recording_demo, skit_or_acting, ai_avatar, ...), `production` (lo_fi_phone, polished_creator, studio_produced), `faceless`, `creator_country` (US, GB, ...), `ai_visuals` (none, partial, heavy), `standout`.
-- `account_type` (app_account, company_account, influencer_creator) labels the apps' own Instagram accounts and only applies with `account=app`.
+- `account`: `all` (default) = the apps' own accounts and creators merged; `app` = the apps' own accounts only (their Instagram reels and their own TikTok accounts); `creator` = creators promoting apps only.
+- Creator-video labels (they leave the apps' own Instagram reels out, since those carry no such labels): `content_style` (ugc_talking_head, screen_recording_demo, skit_or_acting, ai_avatar, ...), `production` (lo_fi_phone, polished_creator, studio_produced), `faceless`, `creator_country` (US, GB, ...), `ai_visuals` (none, partial, heavy), `standout`, `creator_handle` (more videos from an account: the result's `creator.handle`), `min_creator_followers`.
+- `platform`: `instagram` keeps the apps' own Instagram reels next to Instagram creators; `tiktok` returns TikTok videos only (creators, or with `account=app` the apps' own TikTok accounts).
+- `account_type` (app_account, company_account, influencer_creator) labels the apps' own Instagram accounts and limits the search to those reels.
+- Engagement and time: `min_views` / `max_views` (a band such as 10k-100k), `min_likes`, `min_comments`, `posted_within_days` (7 = the last week; the server counts the days), or exact `date_start` / `date_end` as `YYYY-MM-DD` (relative phrases are refused). "Latest" = `sort=recent`. Duration: `min_video_duration_seconds` / `max_video_duration_seconds` (0-1800).
 - Use engagement filters, dates, duration, app revenue, app ids, and category as typed constraints; put the creative idea in `query`.
-- Each result says `source` (`app_reel` or `creator_video`), `platform`, and carries `appfuel_url` (opens that video on App Fuel), `organic.permalink` (the original post) and `creative.video_url`. Creator videos add a `creator` block (handle, followers, country, content_style, production, faceless, ai_visuals, standout); they do not expose a transcript yet.
+- Each result says `source` (`app_reel` = the app's own Instagram reel, `app_video` = the app's own account on UGC Radar, usually its TikTok, `creator_video` = a creator promoting the app), `platform`, and carries `appfuel_url` (opens that video on App Fuel), `organic.permalink` (the original post) and `creative.video_url`. UGC Radar videos add a `creator` block (handle, followers, country, content_style, production, faceless, ai_visuals, standout); they do not expose a transcript yet.
+- Example, "the latest reels about video editing with more than 10k views from the last 7 days": `search_reels` with `query="video editing"`, `min_views=10000`, `posted_within_days=7`, `sort="recent"`, `group_by_app=false`.
 - Use `reel_detail` for one video's full transcript, on-screen text and description (search results truncate them), and `similar_reels` for look-alikes across both kinds of account. Both take `public_id` (`reel_...`, or `ugc-<n>` for a creator video).
 - For "find me the video that ...", use `group_by_app=false` for one ranked list. For "which creators promote app X", use `account=creator` with `include_app_ids`. `app_detail` returns the app's own TikTok handle (`social.tiktok_username`) and `view_urls.creator_videos`.
 - Prefer `public_id` (`reel_...` or `ugc-<n>`) for save-item.
-- With `account=all`, `pagination.next_request` carries a `cursor`; pass it back unchanged.
+- When a page merges the apps' own reels with UGC Radar videos (`account=all`, or `app` without `account_type`), `pagination.next_request` carries a `cursor`; pass it back unchanged.
 
 ## Pagination
 

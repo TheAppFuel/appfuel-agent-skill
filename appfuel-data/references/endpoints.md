@@ -253,7 +253,7 @@ Query rule:
 
 Common ads filters include `category`, `active_status`, `recency`, `include_app_ids`, `app_product_query`, `app_semantic_limit`, `exclude_app_ids`, `media_type`, `people_gender`, `people_role`, `people_age_range`, `creative_format`, `production_quality`, `language`, `cut_speed`, `pain_intensity`, `hook_type`, `min_run_days`, `max_run_days`, `min_video_duration_seconds`, `max_video_duration_seconds`, `web_funnel`, `min_app_revenue`, `max_app_revenue`, `app_release_start`, `app_release_end`, `min_radar_average`, `radar_mins`, and `sort`.
 
-Common reels filters include `category`, `account_type`, `platform`, `content_style`, `production`, `faceless`, `creator_country`, `ai_visuals`, `standout`, `include_app_ids`, `app_product_query`, `app_semantic_limit`, `language`, `hook_type`, `people_gender`, `people_age_range`, `ui_context`, `creator_mode`, `dominant_emotion`, `min_views`, `min_likes`, `min_comments`, `min_video_duration_seconds`, `max_video_duration_seconds`, `min_app_revenue`, `max_app_revenue`, `date_start`, `date_end`, `app_release_start`, `app_release_end`, and `sort`.
+Common reels filters include `category`, `account_type`, `platform`, `content_style`, `production`, `faceless`, `creator_country`, `ai_visuals`, `standout`, `creator_handle`, `min_creator_followers`, `include_app_ids`, `app_product_query`, `app_semantic_limit`, `language`, `hook_type`, `people_gender`, `people_age_range`, `ui_context`, `creator_mode`, `dominant_emotion`, `min_views`, `max_views`, `min_likes`, `min_comments`, `min_video_duration_seconds`, `max_video_duration_seconds`, `min_app_revenue`, `max_app_revenue`, `posted_within_days`, `date_start`, `date_end` (`YYYY-MM-DD`), `app_release_start`, `app_release_end`, and `sort`.
 
 Pagination:
 

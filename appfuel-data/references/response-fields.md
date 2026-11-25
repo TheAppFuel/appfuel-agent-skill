@@ -52,8 +52,8 @@ Organic reel result fields:
 - `public_id`: opaque public organic video id for URLs, `reel_detail`, `similar_reels` and save-item, for example `reel_8080198d0b44ab81e6c5` (creator videos: `ugc-<n>`).
 - `reel_id`: returned organic reel identifier for follow-up when public_id is not available.
 - `appfuel_url`: direct App Fuel link that opens this one video; show it verbatim.
-- `source`: `app_reel` (the app's own Instagram account) or `creator_video` (a creator promoting the app); `platform`: `instagram` or `tiktok`.
-- `creator.handle`, `creator.followers`, `creator.country`, `creator.content_style`, `creator.production`, `creator.faceless`, `creator.ai_visuals`, `creator.standout` (creator videos only; null for the apps' own reels)
+- `source`: `app_reel` (the app's own Instagram reel), `app_video` (the app's own account on UGC Radar, usually its TikTok) or `creator_video` (a creator promoting the app); `platform`: `instagram` or `tiktok`.
+- `creator.handle`, `creator.followers`, `creator.country`, `creator.content_style`, `creator.production`, `creator.faceless`, `creator.ai_visuals`, `creator.standout` (UGC Radar videos only; null for the apps' own Instagram reels)
 - `similarity.score`, `similarity.same_app` (similar_reels results)
 - `app.id`, `app.name`, `app.category`, `app.icon_url`, `app.latest_revenue`
 - `organic.instagram_username`, `organic.account_type`, `organic.permalink`, `organic.posted_at`, `organic.views`, `organic.likes`, `organic.comments`
