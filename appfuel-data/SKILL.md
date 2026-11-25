@@ -1,13 +1,13 @@
 ---
 name: appfuel-data
 metadata:
-  version: 2026-09-21.agent-guide.14
-description: Use App Fuel enriched app, App Store review, paid ad, organic reel, and saved collection intelligence through the App Fuel MCP tools. Trigger when a user asks for app market research, app discovery, competitor lists, review pain points, paid ad examples, organic reel examples, creative patterns, hook research, revenue-filtered app research, or saved App Fuel research collections.
+  version: 2026-11-25.agent-guide.17
+description: Use App Fuel enriched app, App Store review, paid ad, organic video (the apps' own Instagram Reels and creators' TikTok/Instagram videos), and saved collection intelligence through the App Fuel MCP tools. Trigger when a user asks for app market research, app discovery, competitor lists, review pain points, paid ad examples, organic or creator (UGC) video examples, creative patterns, hook research, revenue-filtered app research, or saved App Fuel research collections.
 ---
 
 # App Fuel Data
 
-Use App Fuel for app discovery, competitor research, public App Store reviews, paid ad intelligence, organic Instagram Reel intelligence, and saved research collections.
+Use App Fuel for app discovery, competitor research, public App Store reviews, paid ad intelligence, organic video intelligence (the apps' own Instagram Reels plus creators' TikTok and Instagram videos that promote an app), and saved research collections. The job is to find the exact videos and apps the user asks for and hand back their links.
 
 ## Load Only What You Need
 
@@ -16,7 +16,7 @@ This skill uses progressive disclosure. Read the focused file that matches the r
 | User intent | Read |
 |-------------|------|
 | Find apps, competitors, app revenue, rankings, or similar apps | `workflows/app-research.md` |
-| Find paid ads, organic reels, creative examples, hooks, formats, or similar ads | `workflows/creative-research.md` |
+| Find paid ads, organic reels, creator (UGC) videos, creative examples, hooks, formats, or similar videos | `workflows/creative-research.md` |
 | Mine App Store reviews for pain points, praise, objections, or hook evidence | `workflows/review-research.md` |
 | Save findings, create collections, or organize research | `workflows/saved-research.md` |
 | Decide what to suggest after completing a research task | `workflows/completion-followups.md` |
@@ -34,7 +34,7 @@ Prefer live schema tools when MCP is connected: `describe_agent_schema`, `descri
 5. Use `app_product_query` for app-level semantic matching, such as `photo and video editing apps`; it searches the full app intelligence/profile, not a hook or positioning-only field.
 6. If the user only asks for an app/category/status list and gives no creative-content constraint, pass `query=""`.
 7. For several creative concepts, send `query` as 2-8 semantically distinct alternatives. Do not create tiny spelling, punctuation, casing, singular/plural, contraction, or filler-word variants.
-8. Return `view_url` or `collection.url` when present and useful.
+8. Return links verbatim: `appfuel_url` opens one specific video or ad on App Fuel, `view_url` the gallery with the same filters, `collection.url` a public collection. Never invent URLs.
 9. Treat App Fuel metrics, revenue, ads, reviews, and AI labels as signals unless the response explicitly says otherwise.
 10. Finish useful research by suggesting 2-3 adaptive next actions based on the user's goal, evidence already gathered, missing evidence, and available App Fuel capabilities; read `workflows/completion-followups.md` for the decision pattern.
 

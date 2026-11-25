@@ -49,8 +49,12 @@ Similar paid ad fields:
 
 Organic reel result fields:
 
-- `public_id`: opaque public organic reel id for URLs and save-item, for example `reel_8080198d0b44ab81e6c5`.
+- `public_id`: opaque public organic video id for URLs, `reel_detail`, `similar_reels` and save-item, for example `reel_8080198d0b44ab81e6c5` (creator videos: `ugc-<n>`).
 - `reel_id`: returned organic reel identifier for follow-up when public_id is not available.
+- `appfuel_url`: direct App Fuel link that opens this one video; show it verbatim.
+- `source`: `app_reel` (the app's own Instagram account) or `creator_video` (a creator promoting the app); `platform`: `instagram` or `tiktok`.
+- `creator.handle`, `creator.followers`, `creator.country`, `creator.content_style`, `creator.production`, `creator.faceless`, `creator.ai_visuals`, `creator.standout` (creator videos only; null for the apps' own reels)
+- `similarity.score`, `similarity.same_app` (similar_reels results)
 - `app.id`, `app.name`, `app.category`, `app.icon_url`, `app.latest_revenue`
 - `organic.instagram_username`, `organic.account_type`, `organic.permalink`, `organic.posted_at`, `organic.views`, `organic.likes`, `organic.comments`
 - `creative.title`, `creative.caption_text`, `creative.music_title`, `creative.music_artist`, `creative.video_duration`, `creative.thumbnail_url`, `creative.video_url`
@@ -80,7 +84,8 @@ App search and app detail fields:
 - `revenue_series`: recent monthly app revenue rows when requested.
 - `latest_rankings`: latest category/country/collection ranking snapshot rows when requested. This is capped by `rankings_limit` and is not daily ranking history.
 - `similar_apps`: compact app objects.
-- `view_urls.ads`, `view_urls.organic_reels`: App Fuel gallery entry points for that app.
+- `view_urls.ads`, `view_urls.organic_reels`, `view_urls.creator_videos`: App Fuel gallery entry points for that app.
+- `app.social.tiktok_username`: the app's own TikTok account when known.
 
 App Store review fields:
 

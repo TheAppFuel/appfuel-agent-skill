@@ -1,6 +1,6 @@
 # Creative Research Workflow
 
-Use this workflow for paid ads, organic Reels, hooks, creative patterns, examples, similar ads, and visual App Fuel galleries.
+Use this workflow for paid ads, organic Reels, creator (UGC) videos from TikTok and Instagram, hooks, creative patterns, examples, similar ads or videos, and visual App Fuel galleries.
 
 ## Query Rule
 
@@ -96,16 +96,21 @@ Do not expand one phrase into tiny variants such as `POV`, `POV:`, `POV you`, an
 - Use `similar_ads` when the user asks for more examples like one ad.
 - Prefer `public_id` (`ad_...`) as `creative_key` for `ad_detail`, `similar_ads`, and save-item. Use another returned identifier only when no public id exists.
 
-## Organic Reels
+## Organic Videos (Reels And Creator Videos)
 
-- Use `search_reels` for organic Instagram Reel research.
-- Use `account_type`, engagement filters, dates, duration, app revenue, app ids, and category as typed constraints.
-- Return Reels with enough context to compare creator mechanics, app UI moments, captions, hooks, and engagement.
-- Prefer `public_id` (`reel_...`) for save-item.
+- Use `search_reels` for organic research. `account` picks whose videos: `all` (default) merges the apps' own Instagram Reels with creators' TikTok/Instagram videos that promote an app; `creator` returns creator videos only; `app` the apps' own reels only.
+- Creator-only filters (they switch `account` to `creator`): `platform` (tiktok, instagram), `content_style` (ugc_talking_head, screen_recording_demo, skit_or_acting, ai_avatar, ...), `production` (lo_fi_phone, polished_creator, studio_produced), `faceless`, `creator_country` (US, GB, ...), `ai_visuals` (none, partial, heavy), `standout`.
+- `account_type` (app_account, company_account, influencer_creator) labels the apps' own Instagram accounts and only applies with `account=app`.
+- Use engagement filters, dates, duration, app revenue, app ids, and category as typed constraints; put the creative idea in `query`.
+- Each result says `source` (`app_reel` or `creator_video`), `platform`, and carries `appfuel_url` (opens that video on App Fuel), `organic.permalink` (the original post) and `creative.video_url`. Creator videos add a `creator` block (handle, followers, country, content_style, production, faceless, ai_visuals, standout); they do not expose a transcript yet.
+- Use `reel_detail` for one video's full transcript, on-screen text and description (search results truncate them), and `similar_reels` for look-alikes across both kinds of account. Both take `public_id` (`reel_...`, or `ugc-<n>` for a creator video).
+- For "find me the video that ...", use `group_by_app=false` for one ranked list. For "which creators promote app X", use `account=creator` with `include_app_ids`. `app_detail` returns the app's own TikTok handle (`social.tiktok_username`) and `view_urls.creator_videos`.
+- Prefer `public_id` (`reel_...` or `ugc-<n>`) for save-item.
+- With `account=all`, `pagination.next_request` carries a `cursor`; pass it back unchanged.
 
 ## Pagination
 
-Flat search pages return up to 50 paid creatives or organic reels. Grouped app pages return up to 20 apps, with up to 24 ads or reels per app.
+Flat search pages return up to 50 paid creatives or organic videos. Grouped app pages return up to 20 apps, with up to 24 ads or videos per app.
 
 When `pagination.has_more=true`, call the same tool again with `pagination.next_request`. To inspect more than 24 examples from one selected app, make a follow-up flat request with `include_app_ids`, `group_by=""`, and offset pagination.
 
